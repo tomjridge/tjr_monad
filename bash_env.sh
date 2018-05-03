@@ -5,7 +5,7 @@ set -a # export all vars
 # NOTE in toplevel you need to #require "bos.top" and bos.setup;;
 
 libname="tjr_monad"
-required_packages="stdlib"
+required_packages="lwt"  # may want a separate package for lwt 
 description="Monad type"
 
 function clean() {

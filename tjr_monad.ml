@@ -93,4 +93,7 @@ module Imperative_instance = struct
   let from_m (type a) (x:('a,imperative) m) : 'a = Obj.magic (from_m x)
   let to_m (type a) (x:'a) : ('a,imperative) m = Obj.magic (to_m x)
 
+
+  (* FIXME or state passing with unit, to delay evaluation? then
+     implement a run method *)
 end

@@ -97,3 +97,30 @@ module Imperative_instance = struct
   (* FIXME or state passing with unit, to delay evaluation? then
      implement a run method *)
 end
+
+
+
+(* monadic refs ----------------------------------------------------- *)
+
+(* FIXME deprecate get and set; work instead with a func update *)
+
+module Mref = struct
+  (** Monadic reference operations (deprecated) *)
+  type ('a,'s) mref = {
+    get: unit -> ('a,'s) m;
+    set: 'a -> (unit,'s) m;
+  }
+end
+
+
+module Mref_plus = struct
+(** Monadic reference operations (with_ref version) *)
+(* NOTE with_ref is not 'a -> 'a m; so we cannot perform any monadic
+   actions when we read the ref; this is correct: with_ref is supposed
+   to be an atomic update, so should not eg go to disk *)
+type ('a,'s) mref = {
+  get: unit -> ('a,'s) m;
+  set: 'a -> (unit,'s) m;
+  with_ref: 'b. ('a -> ('b*'a)) -> ('b,'s) m;  (* execute some functional update on state *)
+}
+end

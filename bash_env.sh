@@ -5,6 +5,7 @@ set -a # export all vars
 # NOTE in toplevel you need to #require "bos.top" and bos.setup;;
 
 libname="tjr_monad"
+package_name="$libname"
 required_packages="lwt"  # may want a separate package for lwt 
 description="Monad type"
 
@@ -52,16 +53,17 @@ cmxs="${mls//.ml/.cmx}"
 natives="
 "
 
-branch=`git symbolic-ref --short HEAD` 
-v=`date +'%F'`
-if [ "$branch" = "master" ]; then
-    package_name="${libname}"
-else 
-    package_name="${libname}_${branch}"
-fi
+# branch=`git symbolic-ref --short HEAD` 
+# v=`date +'%F'`
+# if [ "$branch" = "master" ]; then
+#     package_name="${libname}"
+# else 
+#     package_name="${libname}_${branch}"
+# fi
 
 
 function mk_meta() {
+v=`cat VERSION`
 cat >META <<EOF
 name="$package_name"
 description="$description"

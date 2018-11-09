@@ -1,0 +1,7 @@
+(library
+  (name tjr_monad)
+  (public_name tjr_monad)
+  (libraries lwt))
+
+(include_subdirs unqualified)
+

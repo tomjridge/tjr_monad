@@ -7,3 +7,6 @@
 *.a
 /META
 *.native
+/dune-project
+/src/.merlin
+/tjr_monad.install

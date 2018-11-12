@@ -1,4 +1,4 @@
-open Types
+open Monad_ops
 
 (** Monadic reference operations (deprecated) *)
 (* FIXME should be mref_ops? *)

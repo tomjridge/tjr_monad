@@ -1,4 +1,4 @@
-open Types
+open Monad_ops
 
 (** Monadic reference operations (with_ref version) *)
 (* NOTE with_ref is not 'a -> 'a m; so we cannot perform any monadic

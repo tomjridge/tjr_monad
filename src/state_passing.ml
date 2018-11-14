@@ -41,6 +41,14 @@ let monad_ops () : 't state_passing monad_ops = {
   bind=Obj.magic bind
 }
 
+(* get a truly generic version of monad ops? *)
+let monad_ops' : 't state_passing monad_ops = (
+  let bind = fun a b -> (Obj.magic (bind (Obj.magic a) (Obj.magic b))) in
+  {
+    return=(fun x -> (Obj.magic (return x)));
+    bind
+  } : 't state_passing monad_ops)
+
 (* NOTE the type should match the Ignore type, module renaming of 't
    to state_passing 't and mm to m *)
 

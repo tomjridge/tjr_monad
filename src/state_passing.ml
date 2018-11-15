@@ -1,6 +1,9 @@
 open Monad_ops
 
+module State_passing_type = struct
 type 'a state_passing
+end
+include State_passing_type
 
 (* the type ('a, 't state_passing) m is the type of the monad *)
 

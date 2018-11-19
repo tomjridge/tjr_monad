@@ -10,3 +10,4 @@
 /dune-project
 /src/.merlin
 /tjr_monad.install
+_build/

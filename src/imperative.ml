@@ -3,7 +3,7 @@ open Monad_ops
 type imperative
 
 
-module Ignore = struct
+module Internal = struct
   type ('a,'t) mm = 'a
   let return : 'a -> ('a,'t) mm = fun a -> a
   let bind : ('a,'t) mm -> ('a -> ('b,'t) mm) -> ('b,'t) mm =
@@ -12,7 +12,7 @@ module Ignore = struct
   let _ = from_m
   let to_m : 'a -> ('a,'t) mm = fun x -> x 
 end
-open Ignore
+open Internal
 
 let monad_ops : imperative monad_ops = {
   return=Obj.magic return;

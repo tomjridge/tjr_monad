@@ -7,7 +7,7 @@ include State_passing_type
 
 (* the type ('a, 't state_passing) m is the type of the monad *)
 
-module Ignore = struct
+module Internal = struct
   (* this just to make sure the types are correct *)
   type ('a,'t) mm = 't -> 'a * 't
   let return : 'a -> ('a,'t) mm = fun a -> fun t -> (a,t)
@@ -37,7 +37,7 @@ module Ignore = struct
   let _ = with_state
 
 end
-open Ignore
+open Internal
 
 let monad_ops () : 't state_passing monad_ops = {
   return=Obj.magic return;

@@ -76,3 +76,9 @@ let with_world (f:'t->'a * 't) : ('a, 't state_passing) m = Obj.magic (with_worl
 let run ~(init_state:'t) (a:('a,'t state_passing) m) : 'a * 't =
   Obj.magic (run ~init_state (Obj.magic a))
 
+
+let convert_to_imperative (r:'t ref) (a:('a,'t state_passing) m) : 'a =
+  let init_state = !r in
+  run ~init_state a |> fun (a,t) ->
+  r:=t;
+  a

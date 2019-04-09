@@ -10,9 +10,18 @@ install:
 clean:
 	$(DUNE) clean
 
+all:
+	$(MAKE) clean
+	$(MAKE) build
+	$(MAKE) install
+	$(MAKE) docs
 
-doc: FORCE
+SRC:=_build/default/_doc/_html
+DST:=docs
+docs: FORCE
 	$(DUNE) build @doc
+	rm -rf $(DST)/*
+	cp -R $(SRC)/* $(DST)
 
 view_doc:
 	google-chrome  _build/default/_doc/_html/index.html

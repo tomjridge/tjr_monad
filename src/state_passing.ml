@@ -1,9 +1,6 @@
 open Monad_ops
 
-module State_passing_type = struct
 type 'a state_passing
-end
-include State_passing_type
 
 (* the type ('a, 't state_passing) m is the type of the monad *)
 
@@ -16,7 +13,10 @@ module Internal = struct
       a t |> fun (a,t') ->
       ab a t' |> fun (b,t'') ->
       (b,t'')
+
   (* let get_world () : t mm = fun t -> (t,t) *)
+
+(* FIXME of_fun, to_fun?
   let with_world (f:'t -> 'a * 't) : ('a,'t) mm = 
     f
   let run ~(init_state:'t) (a:('a,'t) mm) : 'a * 't = 
@@ -35,7 +35,7 @@ module Internal = struct
     f ~state:s ~set_state
 
   let _ = with_state
-
+*)
 end
 open Internal
 
@@ -44,6 +44,7 @@ let monad_ops () : 't state_passing monad_ops = {
   bind=Obj.magic bind
 }
 
+(*
 (* get a truly generic version of monad ops? *)
 let monad_ops' : 't state_passing monad_ops = (
   let bind = fun a b -> (Obj.magic (bind (Obj.magic a) (Obj.magic b))) in
@@ -55,6 +56,11 @@ let monad_ops' : 't state_passing monad_ops = (
 (* NOTE the type should match the Ignore type, module renaming of 't
    to state_passing 't and mm to m *)
 
+
+let monad_ops : 't state_passing monad_ops = Obj.magic { return; bind }
+*)
+
+(*
 (* FIXME may want to add to_state_passing : 'a mm -> 'a state_passing
    m; from_state_passing: 'a state_passing mm -> 'a m ; ; then have to
    run to/from through the type expression eg for functional args to
@@ -82,3 +88,4 @@ let convert_to_imperative (r:'t ref) (a:('a,'t state_passing) m) : 'a =
   run ~init_state a |> fun (a,t) ->
   r:=t;
   a
+*)

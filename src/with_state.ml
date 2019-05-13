@@ -8,8 +8,10 @@ open Monad_ops
 type ('s,'t) with_state = {
   with_state: 
     'a. 
+      (* a function which has access to the state *)
       (state:'s -> 
        set_state:('s -> (unit,'t)m) -> 
-       ('a,'t) m) 
+       (* and returns a value of type 'a in the monad *)
+       ('a,'t) m)
     -> ('a,'t)m
 }

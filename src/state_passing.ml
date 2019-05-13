@@ -1,91 +1,45 @@
+(** A generic state-passing monad.
+
+The type ('a, 't state_passing) m is the type of the monad *)
+
 open Monad_ops
 
 type 'a state_passing
 
-(* the type ('a, 't state_passing) m is the type of the monad *)
-
 module Internal = struct
-  (* this just to make sure the types are correct *)
   type ('a,'t) mm = 't -> 'a * 't
-  let return : 'a -> ('a,'t) mm = fun a -> fun t -> (a,t)
-  let bind : ('a,'t) mm -> ('a -> ('b,'t) mm) -> ('b,'t) mm =
-    fun a ab t -> 
-      a t |> fun (a,t') ->
-      ab a t' |> fun (b,t'') ->
-      (b,t'')
+  module type ISO = sig
+    val to_m: ('a,'t)mm -> ('a,'t state_passing)m
+    val from_m: ('a,'t state_passing)m -> ('a,'t)mm
+  end
+  module Make(Iso:ISO) = struct 
+    open Iso
+    let return : 'a -> ('a,'t) m = fun a -> 
+      to_m (fun t -> (a,t))
 
-  (* let get_world () : t mm = fun t -> (t,t) *)
+    let bind : ('a,'t) m -> ('a -> ('b,'t) m) -> ('b,'t) m =
+      fun a ab -> to_m (fun t ->
+          (from_m a) t |> fun (a,t') ->
+          (from_m (ab a)) t' |> fun (b,t'') ->
+          (b,t''))
 
-(* FIXME of_fun, to_fun?
-  let with_world (f:'t -> 'a * 't) : ('a,'t) mm = 
-    f
-  let run ~(init_state:'t) (a:('a,'t) mm) : 'a * 't = 
-    a init_state |> fun (a,final_state) -> (a,final_state) 
+    let of_fun : ('t -> 'a * 't) -> ('a,'t state_passing)m = fun x -> to_m x
+    let to_fun : ('a,'t state_passing)m -> ('t -> 'a * 't) = fun x -> from_m x
 
-  let with_state
-      ~(get:'t -> 's)
-      ~(set:'s -> 't -> 't) 
-      ~(f:(state:'s -> set_state:('s -> (unit,'t)mm) -> ('a,'t)mm))
-    : 
-      ('a,'t)mm
-    =
-    let ( >>= ) = bind in
-    let set_state s = fun t -> (),set s t in
-    (fun t -> get t,t) >>= fun s ->
-    f ~state:s ~set_state
-
-  let _ = with_state
-*)
+  end
+  module Iso:ISO = struct
+    let to_m x = Obj.magic x
+    let from_m x = Obj.magic x
+  end
+  module Made = Make(Iso)
 end
-open Internal
+open Internal.Made
+
 
 let monad_ops () : 't state_passing monad_ops = {
   return=Obj.magic return;
   bind=Obj.magic bind
 }
 
-(*
-(* get a truly generic version of monad ops? *)
-let monad_ops' : 't state_passing monad_ops = (
-  let bind = fun a b -> (Obj.magic (bind (Obj.magic a) (Obj.magic b))) in
-  {
-    return=(fun x -> (Obj.magic (return x)));
-    bind
-  } : 't state_passing monad_ops)
-
-(* NOTE the type should match the Ignore type, module renaming of 't
-   to state_passing 't and mm to m *)
-
-
-let monad_ops : 't state_passing monad_ops = Obj.magic { return; bind }
-*)
-
-(*
-(* FIXME may want to add to_state_passing : 'a mm -> 'a state_passing
-   m; from_state_passing: 'a state_passing mm -> 'a m ; ; then have to
-   run to/from through the type expression eg for functional args to
-   functions *)
-let with_state 
-    ~(get:'t -> 's) 
-    ~(set:'s -> 't -> 't) 
-    ~(f: (state:'s -> 
-         set_state:('s -> (unit,'t state_passing)m) -> 
-      ('a,'t state_passing)m))
-  :
-  ('a,'t state_passing)m
-  =
-  Obj.magic (with_state ~get:(Obj.magic get) ~set:(Obj.magic set) ~f:(Obj.magic f))
-
-
-let with_world (f:'t->'a * 't) : ('a, 't state_passing) m = Obj.magic (with_world f)
-
-let run ~(init_state:'t) (a:('a,'t state_passing) m) : 'a * 't =
-  Obj.magic (run ~init_state (Obj.magic a))
-
-
-let convert_to_imperative (r:'t ref) (a:('a,'t state_passing) m) : 'a =
-  let init_state = !r in
-  run ~init_state a |> fun (a,t) ->
-  r:=t;
-  a
-*)
+let of_fun = of_fun
+let to_fun = to_fun

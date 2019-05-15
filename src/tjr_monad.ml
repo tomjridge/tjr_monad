@@ -43,3 +43,14 @@ type ('s,'t) with_state = ('s,'t) With_state.with_state = {
 </pre> %} *)
 
 
+(** {2 Iteration} *)
+
+let iter_m ~monad_ops f x = 
+  let { bind; return } = monad_ops in
+  let ( >>= ) = bind in
+  let rec loop f x = 
+    f x >>= function
+    | None -> return x
+    | Some x' -> loop f x'
+  in
+  loop f x

@@ -1,13 +1,15 @@
-opam-version: "2.0"
-name: "tjr_monad"
-version: "0.0.1"
+opam-version : "2.0"
+name         : "tjr_monad"
+version      : "0.0.1"
+synopsis     : "Generic monad interface, with a phantom tyvar"
 
 # ----------------------------------------------------------------------
 
-authors: "Tom Ridge <tom.j.ridge@googlemail.com>"
-maintainer: "Tom Ridge <tom.j.ridge@googlemail.com>"
-homepage: "https://github.com/tomjridge/tjr_monad"
-bug-reports: "https://github.com/tomjridge/tjr_monad/issues"
+authors      : "Tom Ridge <tom.j.ridge@googlemail.com>"
+maintainer   : "Tom Ridge <tom.j.ridge@googlemail.com>"
+homepage     : "https://github.com/tomjridge/tjr_monad"
+bug-reports  : "https://github.com/tomjridge/tjr_monad/issues"
+dev-repo     : "git://github.com/tomjridge/tjr_monad"
 
 # ----------------------------------------------------------------------
 

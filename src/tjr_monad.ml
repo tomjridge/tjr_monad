@@ -58,3 +58,6 @@ let iter_m ~monad_ops f x =
 let _ : 
 monad_ops:'a monad_ops -> ('b -> ('b option, 'a) m) -> 'b -> ('b, 'a) m
 = iter_m
+
+
+module Event = Event

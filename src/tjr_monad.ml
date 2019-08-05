@@ -70,10 +70,15 @@ module With_lwt = struct
 
   type lwt
 
+  (* FIXME rename to monad_ops? or lwt_monad_ops? *)
   let lwt_ops : lwt monad_ops = {
     return=Obj.magic Lwt.return;
     bind=Obj.magic Lwt.bind
   }
+
+  let return = lwt_ops.return
+  let ( >>= ) = lwt_ops.bind
+
   let to_lwt : ('a,lwt) m -> 'a Lwt.t = fun x -> Obj.magic x
   let from_lwt: 'a t -> ('a,lwt) m = Obj.magic
 

@@ -21,6 +21,11 @@ module State_passing = State_passing
 let state_passing_monad_ops () = State_passing.monad_ops ()
 
 
+(** {2 Imperative} *)
+module Imperative = Imperative
+type imperative = Imperative.imperative
+let imperative_monad_ops = Imperative.imperative_monad_ops
+
 (** {2 With-state} *)
 
 type ('s,'t) with_state = ('s,'t) With_state.with_state = {
@@ -71,13 +76,13 @@ module With_lwt = struct
   type lwt
 
   (* FIXME rename to monad_ops? or lwt_monad_ops? *)
-  let lwt_ops : lwt monad_ops = {
+  let lwt_monad_ops : lwt monad_ops = {
     return=Obj.magic Lwt.return;
     bind=Obj.magic Lwt.bind
   }
 
-  let return = lwt_ops.return
-  let ( >>= ) = lwt_ops.bind
+  let return = lwt_monad_ops.return
+  let ( >>= ) = lwt_monad_ops.bind
 
   let to_lwt : ('a,lwt) m -> 'a Lwt.t = fun x -> Obj.magic x
   let from_lwt: 'a t -> ('a,lwt) m = Obj.magic
@@ -86,13 +91,13 @@ module With_lwt = struct
     let to_ev : 'a t * 'a u -> 'a event = Obj.magic
     let from_ev: 'a event -> 'a t * 'a u = Obj.magic 
 
-    let ev_create () : ('a event,lwt) m = Lwt.task () |> to_ev |> lwt_ops.return
+    let ev_create () : ('a event,lwt) m = Lwt.task () |> to_ev |> return
     let ev_wait ev : ('a,lwt) m = 
       ev |> from_ev |> fun (t,_u) -> 
       from_lwt t
     let ev_signal ev a : (unit,lwt) m =
       ev |> from_ev |> fun (_t,u) -> 
-      Lwt.wakeup u a |> lwt_ops.return
+      Lwt.wakeup u a |> return
   end
 
   open Internal
@@ -103,3 +108,6 @@ module With_lwt = struct
     ev_signal
   }
 end
+
+type lwt = With_lwt.lwt
+let lwt_monad_ops = With_lwt.lwt_monad_ops

@@ -65,6 +65,19 @@ monad_ops:'a monad_ops -> ('b -> ('b option, 'a) m) -> 'b -> ('b, 'a) m
 = iter_m
 
 
+(** A generic version of join, which waits for each m to resolve *)
+let join_seq ~monad_ops =
+  let { bind; return } = monad_ops in
+  let ( >>= ) = bind in
+  let rec loop = function
+    | [] -> return ()
+    | [x] -> x
+    | x::xs -> x >>= fun () -> loop xs  (* FIXME are we sure >>= is tail recursive, ie can loop indefinitely? does it matter here? elsewhere? *)
+  in
+  fun (xs:(unit,'t)m list) ->
+    loop xs
+
+
 module Event = Event
 
 

@@ -124,3 +124,14 @@ end
 
 type lwt = With_lwt.lwt
 let lwt_monad_ops = With_lwt.lwt_monad_ops
+
+
+(** {2 Util} *)
+
+let with_imperative_ref ~monad_ops = 
+  let return = monad_ops.return in
+  fun r -> 
+    let with_state f = 
+      f ~state:(!r) ~set_state:(fun r' -> r:=r'; return ())
+    in
+    { with_state }

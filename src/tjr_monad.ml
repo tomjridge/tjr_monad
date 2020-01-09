@@ -77,9 +77,12 @@ let join_seq ~monad_ops =
   fun (xs:(unit,'t)m list) ->
     loop xs
 
+(** {2 Events} *)
 
 module Event = Event
 
+
+(** {2 With_lwt} *)
 
 module With_lwt = struct
   open Event

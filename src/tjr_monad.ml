@@ -123,6 +123,11 @@ module With_lwt = struct
     ev_wait;
     ev_signal
   }
+
+  let with_ref r = 
+    let with_state f = 
+      f ~state:(!r) ~set_state:(fun s -> r:=s; return ()) in
+    { with_state }
 end
 
 type lwt = With_lwt.lwt

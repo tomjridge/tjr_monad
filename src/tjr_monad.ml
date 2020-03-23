@@ -128,6 +128,17 @@ module With_lwt = struct
     let with_state f = 
       f ~state:(!r) ~set_state:(fun s -> r:=s; return ()) in
     { with_state }
+
+  (** FIXME really, we should always use a lock *)
+  let with_locked_ref r = 
+    let lck = Lwt_mutex.create () in
+    let with_state f = 
+      from_lwt (Lwt_mutex.lock lck) >>= fun () ->
+      f ~state:(!r) ~set_state:(fun s -> r:=s; return ()) >>= fun x ->
+      Lwt_mutex.unlock lck;
+      return x
+    in
+    { with_state }
 end
 
 type lwt = With_lwt.lwt

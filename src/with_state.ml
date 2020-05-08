@@ -15,3 +15,5 @@ type ('s,'t) with_state = {
        ('a,'t) m)
     -> ('a,'t)m
 }
+
+(** NOTE see also with_imperative_ref in Tjr_monad *)

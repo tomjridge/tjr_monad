@@ -1,13 +1,12 @@
-*.cmi
-*.cmo
-*.cma
-*.cmx
-*.cmxa
-*.o
-*.a
-/META
-*.native
-/dune-project
-/src/.merlin
-/tjr_monad.install
-_build/
+# *.cmi
+# *.cmo
+# *.cma
+# *.cmx
+# *.cmxa
+# *.o
+# *.a
+# /META
+# *.native
+# /src/.merlin
+# /tjr_monad.install
+# _build/

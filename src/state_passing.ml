@@ -2,7 +2,7 @@
 
 The type ('a, 't state_passing) m is the type of the monad *)
 
-open Monad_ops
+open Monad_intf
 
 type 'a state_passing
 

@@ -1,7 +1,7 @@
 (library
   (name tjr_monad)
   (public_name tjr_monad)
-  (libraries lwt)
+  (libraries lwt lwt.unix)
 )
 
 (include_subdirs unqualified)

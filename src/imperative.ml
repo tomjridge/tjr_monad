@@ -2,7 +2,7 @@
    return is the identity. Used when performing imperative operations
    eg Unix.read/write. AKA the identity monad *)
 
-open Monad_ops
+open Monad_intf
 
 type imperative
 

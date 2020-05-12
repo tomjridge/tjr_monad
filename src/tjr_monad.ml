@@ -1,9 +1,9 @@
 (** Generic monads *)
 
 
-(** {2 Monad ops type} *)
+(** {2 Monad types} *)
 
-include Monad_ops
+include Monad_intf
 
 
 (** {2 State passing} *)
@@ -22,13 +22,17 @@ let state_passing_monad_ops () = State_passing.monad_ops ()
 
 
 (** {2 Imperative} *)
+
 module Imperative = Imperative
+
 type imperative = Imperative.imperative
+
 let imperative_monad_ops = Imperative.imperative_monad_ops
+
 
 (** {2 With-state} *)
 
-type ('s,'t) with_state = ('s,'t) With_state.with_state = {
+type ('s,'t) with_state = ('s,'t) Monad_intf.with_state = {
   with_state: 
     'a. 
       (state:'s -> 
@@ -36,8 +40,8 @@ type ('s,'t) with_state = ('s,'t) With_state.with_state = {
        ('a,'t) m)
     -> ('a,'t)m
 }
-(** {%html:<pre>
-type ('s,'t) with_state = ('s,'t) With_state.with_state = {
+(** {[
+type ('s,'t) with_state = ('s,'t) Monad_intf.with_state = {
   with_state: 
     'a. 
       (state:'s -> 
@@ -45,10 +49,12 @@ type ('s,'t) with_state = ('s,'t) With_state.with_state = {
        ('a,'t) m)
     -> ('a,'t)m
 }
-</pre> %} *)
+]} *)
 
 
 (** {2 Iteration} *)
+
+(** NOTE prefer iter_k to iter_m *)
 
 let iter_m ~monad_ops f x = 
   let { bind; return } = monad_ops in
@@ -65,7 +71,7 @@ monad_ops:'a monad_ops -> ('b -> ('b option, 'a) m) -> 'b -> ('b, 'a) m
 = iter_m
 
 
-(** A generic version of join, which waits for each m to resolve *)
+(** A generic version of join, which waits for each m to resolve FIXME deprecated *)
 let join_seq ~monad_ops =
   let { bind; return } = monad_ops in
   let ( >>= ) = bind in
@@ -77,69 +83,10 @@ let join_seq ~monad_ops =
   fun (xs:(unit,'t)m list) ->
     loop xs
 
-(** {2 Events} *)
-
-module Event = Event
-
 
 (** {2 With_lwt} *)
 
-module With_lwt = struct
-  open Event
-  open Lwt
-
-
-  type lwt
-
-  (* FIXME rename to monad_ops? or lwt_monad_ops? *)
-  let lwt_monad_ops : lwt monad_ops = {
-    return=Obj.magic Lwt.return;
-    bind=Obj.magic Lwt.bind
-  }
-
-  let return = lwt_monad_ops.return
-  let ( >>= ) = lwt_monad_ops.bind
-
-  let to_lwt : ('a,lwt) m -> 'a Lwt.t = fun x -> Obj.magic x
-  let from_lwt: 'a t -> ('a,lwt) m = Obj.magic
-
-  module Internal = struct
-    let to_ev : 'a t * 'a u -> 'a event = Obj.magic
-    let from_ev: 'a event -> 'a t * 'a u = Obj.magic 
-
-    let ev_create () : ('a event,lwt) m = Lwt.task () |> to_ev |> return
-    let ev_wait ev : ('a,lwt) m = 
-      ev |> from_ev |> fun (t,_u) -> 
-      from_lwt t
-    let ev_signal ev a : (unit,lwt) m =
-      ev |> from_ev |> fun (_t,u) -> 
-      Lwt.wakeup u a |> return
-  end
-
-  open Internal
-
-  let lwt_event_ops : lwt event_ops = { 
-    ev_create;
-    ev_wait;
-    ev_signal
-  }
-
-  let with_ref r = 
-    let with_state f = 
-      f ~state:(!r) ~set_state:(fun s -> r:=s; return ()) in
-    { with_state }
-
-  (** FIXME really, we should always use a lock *)
-  let with_locked_ref r = 
-    let lck = Lwt_mutex.create () in
-    let with_state f = 
-      from_lwt (Lwt_mutex.lock lck) >>= fun () ->
-      f ~state:(!r) ~set_state:(fun s -> r:=s; return ()) >>= fun x ->
-      Lwt_mutex.unlock lck;
-      return x
-    in
-    { with_state }
-end
+module With_lwt = With_lwt
 
 type lwt = With_lwt.lwt
 let lwt_monad_ops = With_lwt.lwt_monad_ops

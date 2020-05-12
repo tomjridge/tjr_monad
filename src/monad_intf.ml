@@ -1,0 +1,75 @@
+(** Generic monad types *)
+
+(** {2 Monad ops} *)
+
+type ('a,'t) m
+
+type 't monad_ops = {
+  return: 'a. 'a -> ('a,'t) m;
+  bind: 'a 'b. ('a,'t) m -> ('a -> ('b,'t) m) -> ('b,'t) m;
+}
+
+(** The async operation completes with unit almost immediately; the
+   argument may be a long-running computation; it is scheduled for
+   execution.
+
+    NOTE Because even creating an 'a m in lwt schedules computation,
+   we shield the argument to async to avoid computation.  *)
+type 't async = (unit -> (unit,'t) m) -> (unit,'t) m 
+
+
+(** A type to allow parameterization over a generic notion of "part of
+   state". Presumably the part of the state is locked while the
+   monadic operation completes, and then the lock is released. *)
+type ('s,'t) with_state = {
+  with_state: 
+    'a. 
+      (* a function which has access to the state *)
+      (state:'s -> 
+       set_state:('s -> (unit,'t)m) -> 
+       (* and returns a value of type 'a in the monad *)
+       ('a,'t) m)
+    -> ('a,'t)m
+}
+(** NOTE see also with_imperative_ref in Tjr_monad *)
+
+
+
+(** {2 Events, with signal (similar to promise)} *)
+
+(** The type of events that resolve to ['a] *)
+type 'a event
+
+(** Multiple threads can be waiting on an event. Only one thread
+   should signal the event. It is an error to signal the same event
+   more than once. If this happens, the new signalled value is
+   discarded and no further actions are taken. FIXME perhaps we should
+   throw an exception or something. An event is a bit like a channel
+   that multiple readers can register on (and all will receive any
+   msgs), and which only carries at most one msg.
+
+
+    NOTE lwt has two types, ['a t] for promises and ['a u] for
+   resolvers. These are implemented using the same underlying
+   structure.
+
+*)
+type 't event_ops = {
+  ev_create: 'a. unit -> ('a event,'t) m;
+  ev_wait: 'a. 'a event -> ('a,'t) m;
+  ev_signal: 'a. 'a event -> 'a -> (unit,'t)m;
+}
+
+
+
+(** {2 Mutexes and cvars} *)
+
+(** What we need from mutexes and condition vars *)
+type ('mutex,'cvar,'t) mutex_ops = {
+  create_mutex : unit -> ('mutex,'t)m;
+  create_cvar  : unit -> ('cvar,'t)m;
+  lock         : 'mutex -> (unit,'t)m;
+  signal       : 'cvar -> (unit,'t)m;  (* FIXME broadcast? *)
+  unlock       : 'mutex -> (unit,'t)m;
+  wait         : 'mutex -> 'cvar -> (unit,'t)m;
+}

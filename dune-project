@@ -14,5 +14,5 @@
  (name tjr_monad)
  (synopsis "A generic monad library, part of ImpFS")
  (depends 
-lwt lwt.unix tjr_profile
+lwt tjr_profile
 ))

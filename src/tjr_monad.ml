@@ -1,14 +1,19 @@
 (** Generic monads *)
 
+(** {2 Summary of main types} *)
+
+include Summary
+
 
 (** {2 Monad types} *)
 
 include Monad_intf
 
 
-(** {2 State passing} *)
+(** {2 State passing monad} *)
 
 type 'a state_passing = 'a State_passing.state_passing
+
 
 (** Conversions to and from function types *)
 
@@ -21,7 +26,7 @@ module State_passing = State_passing
 let state_passing_monad_ops () = State_passing.monad_ops ()
 
 
-(** {2 Imperative} *)
+(** {2 Imperative monad} *)
 
 module Imperative = Imperative
 
@@ -30,8 +35,35 @@ type imperative = Imperative.imperative
 let imperative_monad_ops = Imperative.imperative_monad_ops
 
 
+(** {2 Lwt monad} *)
+
+(* FIXME maybe rename to just Lwt_ *)
+module With_lwt = With_lwt
+
+type lwt = With_lwt.lwt
+let lwt_monad_ops = With_lwt.lwt_monad_ops
+let lwt_event_ops = With_lwt.lwt_event_ops
+let lwt_mutex_ops = With_lwt.lwt_mutex_ops
+let lwt_file_ops = With_lwt.lwt_file_ops
+
+
+(** {2 Util} *)
+
+(** WARNING this is not locked *)
+let with_imperative_ref ~monad_ops = 
+  let return = monad_ops.return in
+  fun r -> 
+    let with_state f = 
+      f ~state:(!r) ~set_state:(fun r' -> r:=r'; return ())
+    in
+    { with_state }
+
+
+
+(*
 (** {2 With-state} *)
 
+(** Expose this type since it is so common *)
 type ('s,'t) with_state = ('s,'t) Monad_intf.with_state = {
   with_state: 
     'a. 
@@ -50,8 +82,10 @@ type ('s,'t) with_state = ('s,'t) Monad_intf.with_state = {
     -> ('a,'t)m
 }
 ]} *)
+*)
 
 
+(*
 (** {2 Iteration} *)
 
 (** NOTE prefer iter_k to iter_m *)
@@ -82,22 +116,5 @@ let join_seq ~monad_ops =
   in
   fun (xs:(unit,'t)m list) ->
     loop xs
+*)
 
-
-(** {2 With_lwt} *)
-
-module With_lwt = With_lwt
-
-type lwt = With_lwt.lwt
-let lwt_monad_ops = With_lwt.lwt_monad_ops
-
-
-(** {2 Util} *)
-
-let with_imperative_ref ~monad_ops = 
-  let return = monad_ops.return in
-  fun r -> 
-    let with_state f = 
-      f ~state:(!r) ~set_state:(fun r' -> r:=r'; return ())
-    in
-    { with_state }

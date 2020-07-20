@@ -1,6 +1,0 @@
-name="tjr_monad"
-description="Monad type"
-version="2018-08-13"
-requires="lwt"
-archive(byte)="tjr_monad.cma"
-archive(native)="tjr_monad.cmxa"

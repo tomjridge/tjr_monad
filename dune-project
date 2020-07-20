@@ -12,7 +12,7 @@
 
 (package 
  (name tjr_monad)
- (synopsis "A generic monad library, part of ImpFS")
+ (synopsis "A generic monad library (part of ImpFS)")
  (depends 
 lwt tjr_profile
 ))

@@ -1,12 +1,13 @@
-(** Generic monad types *)
+(** Generic monad types. NOTE included in top-level package module *)
 
 (** {2 Monad ops} *)
 
 type ('a,'t) m
 
+(* $(PIPE2SH("""sed -n '/type[ ].*monad_ops = /,/^}/p' >GEN.monad_ops.ml_ """)) *)
 type 't monad_ops = {
-  return: 'a. 'a -> ('a,'t) m;
-  bind: 'a 'b. ('a,'t) m -> ('a -> ('b,'t) m) -> ('b,'t) m;
+  return : 'a. 'a -> ('a,'t) m;
+  bind   : 'a 'b. ('a,'t) m -> ('a -> ('b,'t) m) -> ('b,'t) m;
 }
 
 (** The async operation completes with unit almost immediately; the
@@ -21,6 +22,7 @@ type 't async = (unit -> (unit,'t) m) -> (unit,'t) m
 (** A type to allow parameterization over a generic notion of "part of
    state". Presumably the part of the state is locked while the
    monadic operation completes, and then the lock is released. *)
+(* $(PIPE2SH("""sed -n '/type[ ].*with_state = /,/^}/p' >GEN.with_state.ml_ """)) *)
 type ('s,'t) with_state = {
   with_state: 
     'a. 
@@ -35,7 +37,7 @@ type ('s,'t) with_state = {
 
 
 
-(** {2 Events, with signal (similar to promise)} *)
+(** {2 Events, with signal} *)
 
 (** The type of events that resolve to ['a] *)
 type 'a event
@@ -54,6 +56,7 @@ type 'a event
    structure.
 
 *)
+(* $(PIPE2SH("""sed -n '/type[ ].*event_ops = /,/^}/p' >GEN.event_ops.ml_ """)) *)
 type 't event_ops = {
   ev_create: 'a. unit -> ('a event,'t) m;
   ev_wait: 'a. 'a event -> ('a,'t) m;
@@ -62,9 +65,10 @@ type 't event_ops = {
 
 
 
-(** {2 Mutexes and cvars} *)
+(** {2 Mutexes and condition variables} *)
 
 (** What we need from mutexes and condition vars *)
+(* $(PIPE2SH("""sed -n '/type[ ].*mutex_ops = /,/^}/p' >GEN.mutex_ops.ml_ """)) *)
 type ('mutex,'cvar,'t) mutex_ops = {
   create_mutex : unit -> ('mutex,'t)m;
   create_cvar  : unit -> ('cvar,'t)m;

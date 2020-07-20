@@ -125,6 +125,7 @@ module Lwt_file_ops = struct
 end
 
 let lwt_file_ops = Lwt_file_ops.lwt_file_ops
+let file_ops = lwt_file_ops
 
 
 

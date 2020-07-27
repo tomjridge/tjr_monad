@@ -116,9 +116,34 @@ module Lwt_file_ops = struct
   let sync fd = Lwt_unix.fsync fd |> from_lwt
 
   let close fd = Lwt_unix.close fd |> from_lwt
+
+  let pread ~fd ~off ~len = 
+    let x = 
+      let buf = Bytes.create len in
+      Lwt_unix.pread fd buf ~file_offset:off 0 len >>= fun n -> 
+      let buf = 
+        if n = len then buf else
+          Bytes.sub buf 0 n
+      in
+      return buf
+    in
+    x|>from_lwt
+
+  let pwrite ~fd ~off ~buf = 
+    let x = 
+      let len = Bytes.length buf in
+      Lwt_unix.pwrite fd buf ~file_offset:off 0(* in buf *) len >>= fun n -> 
+      assert(n=len); (* FIXME? *)
+      return ()
+    in
+    x|>from_lwt
+
+  let _ = pwrite
     
   let lwt_file_ops = object
     method open_file=open_file
+    method pread=pread
+    method pwrite=pwrite
     method sync=sync
     method close=close
   end

@@ -48,6 +48,11 @@ let event_ops = Lwt_event_ops.lwt_event_ops
 
 (** {2 Lwt mutex ops} *)
 
+type lwt_mutex = Lwt_mutex.t
+type lwt_cvar = unit Lwt_condition.t
+type mutex=lwt_mutex
+type cvar=lwt_cvar
+type lwt_mutex_ops = (mutex,cvar,lwt)mutex_ops
 
 (* private; basic support from lwt. NOTE lock and wait are in Lwt.t *)
 module Lwt_mutex_ops : sig
@@ -87,8 +92,8 @@ end = struct
 
 end
 
-let lwt_mutex_ops = Lwt_mutex_ops.mutex_ops
-let mutex_ops = Lwt_mutex_ops.mutex_ops
+let lwt_mutex_ops : lwt_mutex_ops = Lwt_mutex_ops.mutex_ops
+let mutex_ops = lwt_mutex_ops
 
 
 

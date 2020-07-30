@@ -41,6 +41,7 @@ let imperative_monad_ops = Imperative.imperative_monad_ops
 module With_lwt = With_lwt
 
 type lwt = With_lwt.lwt
+
 let lwt_monad_ops = With_lwt.lwt_monad_ops
 let lwt_event_ops = With_lwt.lwt_event_ops
 let lwt_mutex_ops = With_lwt.lwt_mutex_ops
@@ -57,6 +58,20 @@ let with_imperative_ref ~monad_ops =
       f ~state:(!r) ~set_state:(fun r' -> r:=r'; return ())
     in
     { with_state }
+
+
+(** NOTE unfortunately this returns in the monad *)
+let with_locked_ref ~monad_ops ~mutex_ops r = 
+  let ( >>= ) = monad_ops.bind in
+  let return = monad_ops.return in
+  mutex_ops.create_mutex () >>= fun lck -> 
+  let with_state f = 
+    mutex_ops.lock lck >>= fun () ->
+    f ~state:(!r) ~set_state:(fun s -> r:=s; return ()) >>= fun x ->
+    mutex_ops.unlock lck >>= fun () ->
+    return x
+  in
+  return { with_state }
 
 
 

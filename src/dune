@@ -1,7 +1,8 @@
 (library
   (name tjr_monad)
   (public_name tjr_monad)
-  (libraries lwt lwt.unix)
+  (flags (:standard -open Tjr_lib_core))
+  (libraries lwt lwt.unix tjr_lib_core)
 )
 
 (include_subdirs unqualified)

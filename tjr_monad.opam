@@ -9,7 +9,7 @@ bug-reports: "https://github.com/tomjridge/tjr_monad/issues"
 depends: [
   "dune" {>= "2.0"}
   "lwt" {>= "5.2.0"}
-  "tjr_profile"
+  "tjr_lib_core"
 ]
 build: [
   ["dune" "subst"] {pinned}

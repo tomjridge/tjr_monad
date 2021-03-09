@@ -15,5 +15,5 @@
  (synopsis "A generic monad library (part of ImpFS)")
  (depends 
 (lwt (>= 5.2.0))  ;; prefer Lwt_unix.pread,pwrite for atomic file update
-tjr_lib_core
+;; tjr_lib_core
 ))
